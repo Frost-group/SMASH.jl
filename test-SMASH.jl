@@ -1,6 +1,8 @@
 push!(LOAD_PATH,"./") # Temporary versions of modules in PWD
 using SMASH
 
+using Printf
+
 # Test routines...
 #f=open("testmd2-nonselective_XDATCAR","r")
 f=open("POSCAR-MAPI-Cs") # single unit cell CsPbI3 test; symmetry broken

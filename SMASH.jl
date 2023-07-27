@@ -6,6 +6,10 @@
 # File begun 2014-07-12
 # Addition of minimum volume ellipsoid ~ March 2017
 
+module SMASH
+
+using DelimitedFiles, Printf
+
 export atomic, Trajectory
 export fractionalToCartesian, minimd # Helper fns for minimum image convention
 export minimumVolumeEllipsoid # New 2017! Minimum volume ellipsoid
@@ -26,7 +30,7 @@ atomic=["H", "He",
 #end
 
 #NB: need to read moar on constructors...
-struct Trajectory
+mutable struct Trajectory
    cell
    natoms::Int
    frames
@@ -38,15 +42,13 @@ function readnlines(f,n)
     local lines=""
     local i=1
     for i=1:n
-        # ugly version-dep code! Julia>=0.6 chomps newlines in input stream
-        if VERSION >= v"0.6" lines=lines*readline(f,chomp=false) end
-        if VERSION < v"0.6" lines=lines*readline(f)  end
+        lines=lines*readline(f,keep=false) # keep newlines in input stream
     end
     return (lines)
 end
 
-#readmatrix(f, nlines) = readdlm(IOBuffer(string([readline(f) for i in 1:nlines])))
-readmatrix(f, nlines) = readdlm(IOBuffer(readnlines(f,nlines)))
+#readmatrix(f, nlines) = DelimitedFiles.readdlm(IOBuffer(string([readline(f) for i in 1:nlines])))
+readmatrix(f, nlines) = DelimitedFiles.readdlm(IOBuffer(readnlines(f,nlines)))
 
 # XDATCAR LOOKS LIKE THIS: 
 
@@ -75,14 +77,14 @@ function read_XDATCAR(f::IOStream; supercell::Bool=true)
     println("Unitcell: ")
     println(t.cell)
 
-    atomcrossref=readmatrix(f,2) # Ref to POTCAR; AtomName and #ofatoms
+    atomnames=readmatrix(f,1) # Ref to POTCAR; AtomName and #ofatoms
+    atomnums=readmatrix(f,1)
 #   C     N     H     Pb    I
 #   1     1     6     1     3
-    println("atomcrossref: ",atomcrossref)
 
-    t.natoms=Int(sum(atomcrossref[2,1:end])) #Total atoms in supercell
+    t.natoms=Int(sum(atomnums)) #Total atoms in supercell
 
-    for (count,specie) in zip((atomcrossref[2,1:end]),atomcrossref[1,1:end]) # Each Atom... 
+    for (count,specie) in zip(atomnums,atomnames) # Each Atom... 
         for i=1:count # For i number of each atoms
             push!(t.atomlookup,specie)
         end
@@ -301,4 +303,4 @@ end
 # Quite enough of that; let's get on with the real work...
 
 print_titles()
-
+end # module
