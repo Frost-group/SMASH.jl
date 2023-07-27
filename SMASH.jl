@@ -6,8 +6,6 @@
 # File begun 2014-07-12
 # Addition of minimum volume ellipsoid ~ March 2017
 
-module SMASH 
-
 export atomic, Trajectory
 export fractionalToCartesian, minimd # Helper fns for minimum image convention
 export minimumVolumeEllipsoid # New 2017! Minimum volume ellipsoid
@@ -27,7 +25,8 @@ atomic=["H", "He",
 #    println(Z," ",atomic[Z])
 #end
 
-type Trajectory #NB: need to read moar on constructors...
+#NB: need to read moar on constructors...
+struct Trajectory
    cell
    natoms::Int
    frames
@@ -132,8 +131,8 @@ function read_XDATCAR(f::IOStream; supercell::Bool=true)
         println("<- t.atomlookup")
         show(length(t.atomlookup))
 
-        t.natoms=8*t.natoms
-        t.cell=2.*t.cell
+        t.natoms=8 * t.natoms
+        t.cell=2. * t.cell
     end
 
     println("Trajectory read, containing ",t.nframes," frames")
@@ -303,4 +302,3 @@ end
 
 print_titles()
 
-end # Module
