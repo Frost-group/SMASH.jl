@@ -5,29 +5,12 @@
 # Jarvist Moore Frost, University of Bath
 # File begun 2014-07-12
 # Addition of minimum volume ellipsoid ~ March 2017
+# Removal of obsolete XDATCAR readind code; integration with AtomsIO - July 2023
 
 module SMASH
 
-using DelimitedFiles, Printf
-
-export atomic, Trajectory
 export fractionalToCartesian, minimd # Helper fns for minimum image convention
 export minimumVolumeEllipsoid # New 2017! Minimum volume ellipsoid
-
-atomic=["H", "He", 
-"Li", "Be", "B", "C", "N", "O", "F", "Ne", 
-"Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", 
-"K", "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", 
-"Rb","Sr","Y","Zr","Nb","Mo","Tc","Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te","I", "Xe", 
-"Cs","Ba",
-"La","Ce","Pr","Nd","Pm","Sm","Eu","Gd","Tb","Dy","Ho","Er","Tm","Yb","Lu",
-"Hf","Ta","W","Re","Os","Ir","Pt", "Au", "Hg", "Tl", "Pb", "Bi","Po","At","Rn","Fr","Ra"]
-# indices are atomic number...
-
-# Print our (Atomic Number) table
-#for Z in 1:length(atomic)
-#    println(Z," ",atomic[Z])
-#end
 
 #NB: need to read moar on constructors...
 mutable struct Trajectory
@@ -36,110 +19,6 @@ mutable struct Trajectory
    frames
    nframes::Int
    atomlookup::Array
-end
-
-function readnlines(f,n)
-    local lines=""
-    local i=1
-    for i=1:n
-        lines=lines*readline(f,keep=false) # keep newlines in input stream
-    end
-    return (lines)
-end
-
-#readmatrix(f, nlines) = DelimitedFiles.readdlm(IOBuffer(string([readline(f) for i in 1:nlines])))
-readmatrix(f, nlines) = DelimitedFiles.readdlm(IOBuffer(readnlines(f,nlines)))
-
-# XDATCAR LOOKS LIKE THIS: 
-
-# Perovskite_MD
-#           1
-#    12.580170    0.000078   -0.039648
-#     0.000077   12.547782   -0.000152
-#    -0.039643   -0.000153   12.594017
-#   C    N    H    Pb   I
-#   8   8  48   8  24
-#Direct configuration=    50
-#   0.43568603  0.50228894  0.53798652
-#   0.03842720  0.49679247  0.48113604
-
-function read_XDATCAR(f::IOStream; supercell::Bool=true) 
-    println("Reading trajectory from ")
-    display(f)
-    println()
-
-    t=Trajectory([],0,[],0,[]) 
-    
-    l=readline(f) #Title
-    l=readline(f) #Always a '1' ?
-    
-    t.cell=readdlm(IOBuffer(readnlines(f,3))) #Unit cell spec (3x3 matrix of basis vectors)
-    println("Unitcell: ")
-    println(t.cell)
-
-    atomnames=readmatrix(f,1) # Ref to POTCAR; AtomName and #ofatoms
-    atomnums=readmatrix(f,1)
-#   C     N     H     Pb    I
-#   1     1     6     1     3
-
-    t.natoms=Int(sum(atomnums)) #Total atoms in supercell
-
-    for (count,specie) in zip(atomnums,atomnames) # Each Atom... 
-        for i=1:count # For i number of each atoms
-            push!(t.atomlookup,specie)
-        end
-    end
-    println(t.atomlookup)
-    # --> "C","N","H","H,"H","H","H","H","Pb","I","I","I"
-
-    #frames=readdlm(f , dlm=(r"\r?\n?",r"Direct configuration=?"))
-    #print(frames)
-    
-    t.nframes=0
-    while !eof(f) 
-        t.nframes=t.nframes+1
-
-        stepsizeline=readline(f) # Just dropped
-        coords=readmatrix(f,t.natoms) # natoms set of fractinal {a,b,c} coords
-       
-        show(coords)
-        println("<- coords")
-
-        if (supercell)
-            supercellcoords=coords
-            for cell in [1 0 0; 0 1 0; 0 0 1; 0 1 1; 1 0 1; 1 1 0; 1 1 1]
-                boosted=coords .+ cell
-#                show(boosted)
-                supercellcoords=vcat(supercellcoords,boosted)
-            end
-            
-            show(supercellcoords)
-            print("<- supercellcoords <- length(")
-            show(length(supercellcoords)/3)
-            println(")")
-
-            push!(t.frames,supercellcoords)
-        else
-            push!(t.frames,coords)   # Fractional coordinates!
-        end
-#       print(frame)
-    end
-   
-    if (supercell)
-        lu=t.atomlookup
-        t.atomlookup=vcat(lu,lu,lu,lu,lu,lu,lu,lu)
-
-        show(t.atomlookup)
-        println("<- t.atomlookup")
-        show(length(t.atomlookup))
-
-        t.natoms=8 * t.natoms
-        t.cell=2. * t.cell
-    end
-
-    println("Trajectory read, containing ",t.nframes," frames")
-
-    return t
 end
 
 "fractionToCartesian(a,unitcell)
@@ -304,3 +183,4 @@ end
 
 print_titles()
 end # module
+
