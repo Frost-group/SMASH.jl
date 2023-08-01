@@ -1,0 +1,3 @@
+[deps]
+Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+SMASH = "2871a404-2092-4ff8-a551-ec1ef3166d76"

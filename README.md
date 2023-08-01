@@ -1,4 +1,9 @@
-# Smash
+# SMASH
+
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://Frost-group.github.io/SMASH.jl/stable/)
+[![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://Frost-group.github.io/SMASH.jl/dev/)
+[![Build Status](https://github.com/Frost-group/SMASH.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/Frost-group/SMASH.jl/actions/workflows/CI.yml?query=branch%3Amain)
+[![Coverage](https://codecov.io/gh/Frost-group/SMASH.jl/branch/main/graph/badge.svg)](https://codecov.io/gh/Frost-group/SMASH.jl)
 
 Reconstituting the Glazer tilt notation for Perovskites from sampling molecular
 dynamics.
@@ -6,6 +11,9 @@ dynamics.
 These codes are written in the Julia Language
 [ http://julialang.org ].
 
+Codes originally written in 2014 to analyse MD trajectories of Methlyammonium
+Lead Iodide; dragged into 2023 for similar service in the Copper-Lead-Apatite
+proposed superconductor.
 
 
 # Potato
@@ -76,5 +84,6 @@ Rotations and Internal Motions in the N-Body Problem.” Reviews of Modern Physi
 69, no. 1 (January 1, 1997): 213–76. 
 [ http://dx.doi.org/10.1103/RevModPhys.69.213 ]
 *Long review covering Gauge Fields as applied to N-body problems*
+
 
 
