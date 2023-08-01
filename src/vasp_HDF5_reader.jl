@@ -24,6 +24,7 @@ read(h["results/positions/number_ion_types"])
 
 read(h["intermediate/ion_dynamics/position_ions"])
 #3×44×242 Array{Float64, 3}:
+# fractional coordinates.
 
 read(h["intermediate/ion_dynamics/lattice_vectors"])
 #3×3×242 Array{Float64, 3}:
