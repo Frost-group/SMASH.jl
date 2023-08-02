@@ -9,6 +9,7 @@ AtomsIO = "1692102d-eeb4-4df9-807b-c9517f998d44"
 AtomsIOPython = "9e4c859b-2281-48ef-8059-f50fe53c37b0"
 
 [compat]
+AtomsBase = "0.3"
 julia = "1.9"
 
 [extras]
